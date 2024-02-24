@@ -5,12 +5,13 @@ import UserName from "../features/user/UserName";
 export default function Header() {
   return (
     <div
-      className="bg-rose-500 uppercase
+      className="  flex items-center justify-between border-b border-stone-300 bg-rose-500 px-4
+      py-3 uppercase
     "
     >
       <Link
         to="/"
-        className="tracking-[10px] font-bold
+        className="font-bold tracking-[10px]
 "
       >
         Pizza store

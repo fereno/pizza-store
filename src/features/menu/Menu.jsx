@@ -8,12 +8,11 @@ const Menu = () => {
   console.log("menu", menu);
 
   return (
-    <>
-      <h1>Menu</h1>
+    <ul className="divide-y divide-stone-200 px-2">
       {menu.map((m) => (
         <MenuItem key={m.id} pizza={m} />
       ))}
-    </>
+    </ul>
   );
 };
 

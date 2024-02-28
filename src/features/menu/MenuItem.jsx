@@ -4,6 +4,7 @@ import Button from "../../ui/Button";
 import { formatCurrency } from "../../utils/helpers";
 import { addItem, getQuantityOfCurrentItemById } from "../cart/cartSlice";
 import DeleteItem from "../cart/DeleteItem";
+import UpdateItemQuantity from "../cart/UpdateItemQuantity";
 
 function MenuItem({ pizza }) {
   // eslint-disable-next-line no-unused-vars
@@ -12,7 +13,7 @@ function MenuItem({ pizza }) {
 
   function handelAddToCart() {
     const newItem = {
-      id,
+      pizzaId: id,
       name,
       quantity: 1,
       unitPrice,
@@ -54,7 +55,12 @@ function MenuItem({ pizza }) {
               Add to cart
             </Button>
           )}
-          {isInCart && <DeleteItem pizzaId={id} />}
+          {isInCart &&  <div className="flex gap-3 md:gap-8 items-center">
+            <UpdateItemQuantity pizzaId={id} currentQuantity={currentItemQuantity} />
+
+            <DeleteItem pizzaId={id} />
+          </div>
+          }
         </div>
       </div>
     </li>

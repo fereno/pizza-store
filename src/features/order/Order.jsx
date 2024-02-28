@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // Test ID: IIDSAT
 
-import { useLoaderData, useParams } from "react-router-dom";
+import { useFetcher, useLoaderData, useParams } from "react-router-dom";
 import { getOrder } from "../../services/apiRestaurant";
 import {
   calcMinutesLeft,
@@ -9,6 +9,8 @@ import {
   formatDate,
 } from "../../utils/helpers";
 import OrderItem from "./OrderItem";
+import { useEffect } from "react";
+import UpdateOrder from "./UpdateOrder";
 
 // const order = {
 //   id: "ABCDEF",
@@ -57,40 +59,69 @@ function Order() {
     estimatedDelivery,
     cart,
   } = useLoaderData();
-  console.log("order", useLoaderData());
+  const fetcher = useFetcher();
 
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state === "idle") fetcher.load("/menu");
+  }, [fetcher]);
+
+
   return (
-    <div className="divide-y border-b border-t px-4 py-3">
-      <div className="sm:flex justify-between items-center py-2">
+    <div className=" divide-y border-b border-t px-4 py-3">
+      <div className="items-center justify-between py-2 sm:flex">
         <h2 className=" text-xl font-semibold">Order #{id} status</h2>
 
         <div className="space-x-2">
-          {priority && <span className="bg-red-600 tracking-wide uppercase py-1 px-2 rounded-full text-sm text-stone-200">Priority</span>}
-          <span className="bg-green-600 tracking-wide uppercase py-1 px-2 rounded-full text-stone-200 text-sm">{status} order</span>
+          {priority && (
+            <span className="rounded-full bg-red-600 px-2 py-1 text-sm uppercase tracking-wide text-stone-200">
+              Priority
+            </span>
+          )}
+          <span className="rounded-full bg-green-600 px-2 py-1 text-sm uppercase tracking-wide text-stone-200">
+            {status} order
+          </span>
         </div>
       </div>
 
-      
-      <div className="bg-stone-200 p-3 flex justify-between items-center">
+      <div className="flex items-center justify-between bg-stone-200 p-3">
         <p className="font-semibold ">
           {deliveryIn >= 0
             ? `Only ${calcMinutesLeft(estimatedDelivery)} minutes left 😃`
             : "Order should have arrived"}
         </p>
-        <p className="text-xs ">(Estimated delivery: {formatDate(estimatedDelivery)})</p>
+        <p className="text-xs ">
+          (Estimated delivery: {formatDate(estimatedDelivery)})
+        </p>
       </div>
 
       <ul className="divide-y border-b  border-t py-5">
-        {cart.map(item => <OrderItem key={item.id} item={item}/>)}
+        {cart.map((item) => (
+          <OrderItem
+            key={item.pizzaId}
+            item={item}
+            ingredients={
+              fetcher?.data?.find((el) => el.id === item.pizzaId).ingredients ??
+              []
+            }
+            isLoadingIngredients={fetcher?.state === "loading"}
+          />
+        ))}
       </ul>
 
       <div className="bg-stone-200 p-5 ">
         <p className="text-sm">Price pizza: {formatCurrency(orderPrice)}</p>
-        {priority && <p className="text-sm">Price priority: {formatCurrency(priorityPrice)}</p>}
-        <p className="font-semibold">To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}</p>
+        {priority && (
+          <p className="text-sm">
+            Price priority: {formatCurrency(priorityPrice)}
+          </p>
+        )}
+        <p className="font-semibold">
+          To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
+        </p>
       </div>
+      { !priority && <UpdateOrder />}
     </div>
   );
 }
